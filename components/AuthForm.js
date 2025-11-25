@@ -2,14 +2,13 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-export default function AuthForm({ onLogin }) {
+export default function AuthForm() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [isRegister, setIsRegister] = useState(false) // Toggle Login/Register
+  const [isRegister, setIsRegister] = useState(false)
   const [message, setMessage] = useState('')
 
-  // Trik: Tambahkan domain palsu agar Supabase menganggap ini email
   const email = `${username}@game.local`
 
   const handleAuth = async (e) => {
@@ -17,28 +16,20 @@ export default function AuthForm({ onLogin }) {
     setLoading(true)
     setMessage('')
 
-    let error
-    if (isRegister) {
-      // Register
-      const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      })
-      error = signUpError
-      if (!error) setMessage('Akun dibuat! Silakan login.')
-    } else {
-      // Login
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-      error = signInError
-    }
-
-    if (error) {
+    try {
+      if (isRegister) {
+        const { error } = await supabase.auth.signUp({ email, password })
+        if (error) throw error
+        setMessage('Akun dibuat! Silakan login.')
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({ email, password })
+        if (error) throw error
+      }
+    } catch (error) {
       setMessage(error.message)
-    } 
-    setLoading(false)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -66,20 +57,24 @@ export default function AuthForm({ onLogin }) {
             required
           />
           
-          <button 
+          <button
+            type="submit"
             disabled={loading}
             className="bg-blue-600 hover:bg-blue-700 p-2 rounded font-bold transition disabled:opacity-50"
           >
-            {loading ? 'Memproses...' : (isRegister ? 'Daftar' : 'Masuk')}
+            {loading ? 'Memproses...' : isRegister ? 'Daftar' : 'Masuk'}
           </button>
         </form>
 
-        {message && <p className="mt-4 text-sm text-yellow-400 text-center">{message}</p>}
+        {message && (
+          <p className="mt-4 text-sm text-yellow-400 text-center">{message}</p>
+        )}
 
         <p className="mt-4 text-xs text-center text-gray-400">
-          {isRegister ? "Sudah punya akun? " : "Belum punya akun? "}
-          <button 
-            onClick={() => setIsRegister(!isRegister)} 
+          {isRegister ? 'Sudah punya akun? ' : 'Belum punya akun? '}
+          <button
+            type="button"
+            onClick={() => setIsRegister(!isRegister)}
             className="text-blue-400 underline"
           >
             {isRegister ? 'Login' : 'Daftar'}

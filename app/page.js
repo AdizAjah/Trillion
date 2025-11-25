@@ -9,16 +9,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Cek sesi saat ini
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setLoading(false)
     })
 
-    // Listener perubahan auth (login/logout)
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
     })
 
@@ -26,16 +22,12 @@ export default function Home() {
   }, [])
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">Loading...</div>
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+        Loading...
+      </div>
+    )
   }
 
-  return (
-    <main>
-      {!session ? (
-        <AuthForm />
-      ) : (
-        <GachaGame session={session} />
-      )}
-    </main>
-  )
+  return <main>{!session ? <AuthForm /> : <GachaGame session={session} />}</main>
 }

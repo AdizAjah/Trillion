@@ -1,18 +1,10 @@
+import { getTierColor } from '../lib/utils'
+import { GAME_CONFIG } from '../lib/constants'
+
 export default function Library({ isOpen, onClose, collection }) {
-    if (!isOpen) return null
-  
-    // Helper untuk warna (sama dengan logika Gacha)
-    const getTierColor = (num) => {
-      if (num === 1000) return 'bg-gradient-to-r from-yellow-300 via-red-500 to-purple-600 border-yellow-400 text-black animate-pulse'
-      if (num >= 900) return 'bg-red-900 border-red-500 text-red-200 shadow-[0_0_10px_red]'
-      if (num >= 700) return 'bg-purple-900 border-purple-500 text-purple-200'
-      if (num >= 400) return 'bg-blue-900 border-blue-500 text-blue-200'
-      if (num >= 100) return 'bg-green-900 border-green-500 text-green-200'
-      return 'bg-gray-700 border-gray-600 text-gray-400' // Common
-    }
-  
-    // Hitung persentase kelengkapan
-    const progress = ((collection.length / 1000) * 100).toFixed(1)
+  if (!isOpen) return null
+
+  const progress = ((collection.length / GAME_CONFIG.MAX_NUMBER) * 100).toFixed(1)
   
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -23,7 +15,7 @@ export default function Library({ isOpen, onClose, collection }) {
             <div>
               <h2 className="text-xl font-bold text-white">📚 Library Angka</h2>
               <p className="text-xs text-gray-400">
-                Progress: <span className="text-yellow-400 font-bold">{collection.length}</span> / 1000 ({progress}%)
+                Progress: <span className="text-yellow-400 font-bold">{collection.length}</span> / {GAME_CONFIG.MAX_NUMBER} ({progress}%)
               </p>
             </div>
             <button onClick={onClose} className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
@@ -34,7 +26,7 @@ export default function Library({ isOpen, onClose, collection }) {
           {/* Grid Scrollable */}
           <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
             <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
-              {Array.from({ length: 1000 }, (_, i) => {
+              {Array.from({ length: GAME_CONFIG.MAX_NUMBER }, (_, i) => {
                 const num = i + 1
                 const isUnlocked = collection.includes(num)
                 

@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Gacha Number Game",
+  title: "Trillione",
   description: "Roll numbers and collect them all!",
 }
 
